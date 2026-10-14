@@ -19,7 +19,7 @@ def api_history():
             with _history_lock:
                             return jsonify({"history": list(reversed(_history[-50:]))})
 
-        @app.get("/api/memory")
+@app.get("/api/memory")
 def api_memory():
             try:
                             from app.important_memory import ImportantMemoryStore
