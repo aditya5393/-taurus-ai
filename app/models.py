@@ -10,10 +10,45 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
-_client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1",
-)
+
+# Lazy client: do NOT create OpenAI() at import time.
+# On Streamlit Cloud, GROQ_API_KEY comes from Secrets (st.secrets) and may not be
+# in os.environ yet at import. Creating the client eagerly crashed the whole app
+# with OpenAIError before the UI could even show a helpful message.
+_client = None
+
+
+def _get_groq_key() -> str | None:
+    # 1. Environment variable (.env locally, Secrets as env vars on Streamlit)
+    key = os.getenv("GROQ_API_KEY")
+    if key:
+        return key
+    # 2. Streamlit Secrets (st.secrets) - the reliable source on Streamlit Cloud
+    try:
+        import streamlit as st
+        if "GROQ_API_KEY" in st.secrets:
+            k = st.secrets["GROQ_API_KEY"]
+            if k:
+                os.environ["GROQ_API_KEY"] = str(k)
+                return str(k)
+    except Exception:
+        pass
+    return None
+
+
+def get_client():
+    global _client
+    if _client is not None:
+        return _client
+    key = _get_groq_key()
+    if not key:
+        raise RuntimeError(
+            "GROQ_API_KEY is not set. On Streamlit Cloud: Manage app > Settings > Secrets > "
+            'add GROQ_API_KEY = "gsk_..." then Reboot the app. Locally: put it in .env'
+        )
+    _client = OpenAI(api_key=key, base_url="https://api.groq.com/openai/v1")
+    return _client
+
 
 # --- Model Registry: specialized LLMs per task (Groq free tier) ---
 # If a model name is not available on your Groq account, it auto-falls back to llama-3.3-70b.
@@ -57,8 +92,9 @@ ROUTER_MODEL = "llama-3.3-70b-versatile"
 
 def ask_with_model(model: str, system: str, user: str, temperature: float = 0.3) -> str:
     """Call a specific model. Falls back to router model if the specialized model fails."""
+    client = get_client()
     try:
-        res = _client.chat.completions.create(
+        res = client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": system},
@@ -70,7 +106,7 @@ def ask_with_model(model: str, system: str, user: str, temperature: float = 0.3)
     except Exception as e:
         if model != ROUTER_MODEL:
             # Fallback: specialized model not available -> use general model
-            res = _client.chat.completions.create(
+            res = client.chat.completions.create(
                 model=ROUTER_MODEL,
                 messages=[
                     {"role": "system", "content": system},

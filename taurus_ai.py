@@ -14,14 +14,23 @@ import requests
 import sympy as sp
 
 load_dotenv()
-client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1",
-)
+_client = None
 MODEL = "llama-3.3-70b-versatile"
 
 
+def _get_client():
+    global _client
+    if _client is not None:
+        return _client
+    key = os.getenv("GROQ_API_KEY")
+    if not key:
+        raise RuntimeError("GROQ_API_KEY is not set. Put it in .env (free from console.groq.com)")
+    _client = OpenAI(api_key=key, base_url="https://api.groq.com/openai/v1")
+    return _client
+
+
 def ask_llm(system, user):
+    client = _get_client()
     res = client.chat.completions.create(
         model=MODEL,
         messages=[

@@ -2,11 +2,30 @@
 Run: streamlit run app/streamlit_app_v4.py
 Shows: Memory recalled -> Router -> Plan -> Result -> What Taurus Learned -> Memory panel
 """
+import os
 import streamlit as st
+
+# Load GROQ_API_KEY from Streamlit Secrets into env BEFORE importing executor,
+# so models.py / router.py can find it. Secrets are the source on Streamlit Cloud.
+try:
+    if "GROQ_API_KEY" in st.secrets and st.secrets["GROQ_API_KEY"]:
+        os.environ["GROQ_API_KEY"] = str(st.secrets["GROQ_API_KEY"])
+except Exception:
+    pass
+
 from app.executor_v4 import run_agentic_task_v4
 from app.important_memory import list_important, list_lessons, save_important
 
 st.set_page_config(page_title="Taurus AI v4 - Self-Learning", page_icon="♉")
+
+# Friendly check instead of a redacted OpenAIError crash on import
+if not os.getenv("GROQ_API_KEY"):
+    st.error(
+        "GROQ_API_KEY is not set. In Streamlit Cloud: click 'Manage app' (bottom-right) > "
+        "Settings > Secrets > add one line: GROQ_API_KEY = \"gsk_...\" (get a free key from "
+        "console.groq.com) > Save > Reboot the app. The app will load once the key is set."
+    )
+    st.stop()
 st.title("♉ Taurus AI v4 — Self-Learning + Memory")
 st.caption("Taurus learns from every task and remembers important data. Try it, correct it, watch it improve.")
 
