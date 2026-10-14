@@ -24,7 +24,7 @@ def api_memory():
             try:
                             from app.important_memory import ImportantMemoryStore
                             return jsonify({"memories": ImportantMemoryStore().list_memories()})
-except Exception as e:
+                except Exception as e:
         return jsonify({"memories": [], "error": str(e)})
 
 @app.post("/api/execute")
