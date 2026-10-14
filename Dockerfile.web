@@ -1,0 +1,11 @@
+# Taurus AI — Real web app (Flask + decided UI) for Render free tier.
+# Separate from Dockerfile (Streamlit), which is left untouched.
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+# Render sets $PORT; default 10000 for local docker runs.
+ENV PORT=10000
+EXPOSE 10000
+CMD ["sh", "-c", "gunicorn web_app:app -b 0.0.0.0:$PORT --workers 1 --timeout 120"]

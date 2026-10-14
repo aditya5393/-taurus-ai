@@ -1,0 +1,16 @@
+# Render Blueprint — Taurus AI real web app (Flask + decided UI).
+# Deploy: Render Dashboard > New > Blueprint > connect repo aditya5393/-taurus-ai
+# Then set GROQ_API_KEY in Dashboard > Service > Environment (free key from console.groq.com).
+services:
+  - type: web
+    name: taurus-ai
+    env: python
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn web_app:app -b 0.0.0.0:$PORT --workers 1 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: GROQ_API_KEY
+        sync: false
