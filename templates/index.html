@@ -1,0 +1,1478 @@
+<!doctype html>
+<!-- Taurus web: bull images re-encoded to WebP 300px q70 (alpha/transparency preserved) so the file fits hosting push limits; layout, CSS, bull calm/angry states, and JS behavior are identical to the decided artifact. Original artifact untouched. -->
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#0b0d12" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Taurus AI v4 — Adaptive Agentic Workspace</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f1f0eb;
+      --surface: #ffffff;
+      --surface-2: #e7e5df;
+      --surface-3: #dcd9d1;
+      --ink: #171713;
+      --muted: #68675f;
+      --line: #cbc8be;
+      --accent: #087fd6;
+      --accent-soft: #dceffb;
+      --accent-ink: #064f86;
+      --good: #1f7651;
+      --good-soft: #dcebe2;
+      --warn: #986219;
+      --warn-soft: #f5e8c9;
+      --code: #171815;
+      --code-ink: #e8e4d9;
+      --shadow: 0 18px 50px rgba(42, 38, 29, .1);
+      --radius-lg: 28px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #10100f;
+        --surface: #191918;
+        --surface-2: #24231f;
+        --surface-3: #302e29;
+        --ink: #f3f0e7;
+        --muted: #aaa79d;
+        --line: #3a3832;
+        --accent: #27b9ff;
+        --accent-soft: #102f43;
+        --accent-ink: #82d7ff;
+        --good: #65c99d;
+        --good-soft: #1c3b2d;
+        --warn: #e9b45f;
+        --warn-soft: #3e311b;
+        --code: #090a08;
+        --code-ink: #ebe7dc;
+        --shadow: 0 20px 60px rgba(0, 0, 0, .28);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--bg); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(90deg, transparent 0 63px, color-mix(in srgb, var(--accent) 7%, transparent) 64px, transparent 65px), var(--bg);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, textarea { font: inherit; }
+    button { color: inherit; }
+    .app { width: min(1440px, 100%); min-height: 100vh; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); }
+    .rail { padding: 22px 18px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 24px; background: color-mix(in srgb, var(--bg) 92%, transparent); }
+    .new-button { width: 100%; border: 1px solid var(--ink); background: var(--ink); color: var(--bg); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-weight: 600; }
+    .new-button svg { width: 18px; height: 18px; }
+    .rail-section h2 { font: 500 11px/1.2 "IBM Plex Mono", monospace; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+    .agent-list { display: grid; gap: 4px; }
+    .agent { display: grid; grid-template-columns: 9px 1fr auto; align-items: center; gap: 10px; padding: 8px 7px; border-radius: 8px; font-size: 14px; }
+    .agent.active { background: var(--surface-2); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+    .dot.router { background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .agent small { font: 400 10px/1 "IBM Plex Mono", monospace; color: var(--muted); }
+    .rail-bottom { margin-top: auto; }
+    .stack-note { border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .stack-note strong { color: var(--ink); font-weight: 600; }
+    .main { min-width: 0; display: flex; flex-direction: column; }
+    .topbar { height: 68px; padding: 0 30px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .view-tabs { display: flex; gap: 4px; }
+    .view-tab { background: transparent; border: 0; border-radius: 8px; color: var(--muted); padding: 8px 11px; cursor: pointer; font-weight: 500; }
+    .view-tab.active { background: var(--surface-2); color: var(--ink); }
+    .status { display: flex; align-items: center; gap: 8px; color: var(--muted); font: 500 11px/1 "IBM Plex Mono", monospace; }
+    .status .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--good); }
+    .content { width: min(1060px, calc(100% - 48px)); margin: 0 auto; padding: 58px 0 64px; }
+    .view { display: none; }
+    .view.visible { display: block; }
+    .intro { max-width: 790px; }
+    .eyebrow { margin: 0 0 13px; color: var(--accent); font: 500 12px/1 "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 780px; font-size: clamp(38px, 6vw, 72px); line-height: .98; letter-spacing: -.052em; font-weight: 600; }
+    .lede { margin: 22px 0 0; max-width: 650px; color: var(--muted); font-size: 18px; line-height: 1.55; }
+    .composer { margin-top: 34px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+    textarea { width: 100%; min-height: 126px; resize: vertical; padding: 23px 24px 12px; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 17px; line-height: 1.5; }
+    textarea::placeholder { color: var(--muted); opacity: .78; }
+    .composer-actions { padding: 12px 14px 14px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .mode-label { color: var(--muted); font: 500 11px/1 "IBM Plex Mono", monospace; display: flex; align-items: center; gap: 8px; }
+    .mode-label svg { width: 16px; color: var(--accent); }
+    .run-button, .demo-button { border: 0; border-radius: 14px; background: var(--accent); color: #fffaf4; padding: 12px 17px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; }
+    .run-button:disabled, .demo-button:disabled { opacity: .55; cursor: wait; }
+    .run-button svg { width: 18px; height: 18px; }
+    .secondary-button { border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 12px; padding: 10px 14px; cursor: pointer; font-weight: 500; }
+    .suggestions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .suggestion { min-height: 92px; text-align: left; padding: 14px 15px; border: 1px solid var(--line); border-radius: 14px; background: transparent; cursor: pointer; transition: background .18s ease, border-color .18s ease; }
+    .suggestion:hover, .suggestion:focus-visible { background: var(--surface); border-color: var(--accent); }
+    .suggestion span { display: block; font: 500 10px/1 "IBM Plex Mono", monospace; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em; }
+    .suggestion strong { font-size: 13px; line-height: 1.35; font-weight: 500; }
+    .plan-preview { display: none; margin-top: 32px; }
+    .plan-preview.visible { display: block; }
+    .plan-card { border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+    .plan-head { padding: 24px 26px 19px; display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; border-bottom: 1px solid var(--line); }
+    .plan-head h2 { margin: 0 0 7px; font-size: 24px; letter-spacing: -.03em; }
+    .plan-head p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .route-badges { display: flex; flex-wrap: wrap; gap: 7px; }
+    .route-badge { color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 6px 9px; font: 500 10px/1 "IBM Plex Mono", monospace; }
+    .plan-steps { padding: 8px 26px 22px; }
+    .plan-step { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 13px; align-items: start; padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .plan-step:last-child { border-bottom: 0; }
+    .plan-index { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; font: 500 10px/1 "IBM Plex Mono", monospace; }
+    .plan-step h3 { margin: 1px 0 5px; font-size: 15px; }
+    .plan-step p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .step-owner { font: 500 10px/1 "IBM Plex Mono", monospace; color: var(--muted); padding-top: 6px; }
+    .capabilities { margin-top: 76px; border-top: 1px solid var(--line); padding-top: 22px; }
+    .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 20px; }
+    .section-head h2 { margin: 0; font-size: 22px; letter-spacing: -.025em; }
+    .section-head p { margin: 0; color: var(--muted); font: 400 11px/1.2 "IBM Plex Mono", monospace; }
+    .cap-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+    .cap-primary, .cap-secondary { background: var(--surface); border: 1px solid var(--line); }
+    .cap-primary { min-height: 306px; padding: 28px; border-radius: var(--radius-md) 42px var(--radius-md) var(--radius-md); display: flex; flex-direction: column; justify-content: space-between; }
+    .cap-side { display: grid; gap: 12px; }
+    .cap-secondary { padding: 22px; border-radius: var(--radius-md); min-height: 147px; }
+    .cap-number { font: 500 11px/1 "IBM Plex Mono", monospace; color: var(--accent); }
+    .cap-primary h3, .cap-secondary h3 { margin: 0; letter-spacing: -.025em; }
+    .cap-primary h3 { font-size: 31px; }
+    .cap-secondary h3 { font-size: 20px; }
+    .cap-primary p, .cap-secondary p { color: var(--muted); line-height: 1.5; margin: 10px 0 0; }
+    .cap-primary p { max-width: 520px; }
+    .tool-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 22px; }
+    .tool { background: var(--surface-2); border-radius: 999px; padding: 6px 9px; font: 500 10px/1 "IBM Plex Mono", monospace; }
+    .demo-shell { margin-top: 36px; display: grid; grid-template-columns: 255px minmax(0,1fr); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+    .demo-side { background: var(--surface-2); padding: 24px; border-right: 1px solid var(--line); }
+    .demo-side h2 { margin: 0 0 8px; font-size: 17px; }
+    .demo-side > p { margin: 0 0 22px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .demo-step { display: grid; grid-template-columns: 22px 1fr; gap: 9px; align-items: start; margin-bottom: 17px; color: var(--muted); font-size: 13px; }
+    .demo-step .marker { width: 21px; height: 21px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font: 500 9px/1 "IBM Plex Mono", monospace; }
+    .demo-step.done { color: var(--ink); }
+    .demo-step.done .marker { background: var(--good); border-color: var(--good); color: #fff; }
+    .demo-step.active { color: var(--ink); font-weight: 600; }
+    .demo-step.active .marker { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .demo-main { min-width: 0; padding: 26px; }
+    .demo-objective { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+    .demo-objective small { color: var(--accent); font: 500 10px/1 "IBM Plex Mono", monospace; }
+    .demo-objective h2 { margin: 9px 0 0; max-width: 680px; font-size: 22px; line-height: 1.3; letter-spacing: -.02em; }
+    .demo-log { min-height: 300px; padding: 22px 0 8px; }
+    .empty-log { color: var(--muted); line-height: 1.6; max-width: 610px; }
+    .log-entry { display: grid; grid-template-columns: 110px minmax(0,1fr); gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .log-entry:last-child { border-bottom: 0; }
+    .log-agent { font: 500 10px/1.4 "IBM Plex Mono", monospace; color: var(--accent); }
+    .log-body h3 { margin: 0 0 6px; font-size: 15px; }
+    .log-body p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .log-body ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    pre { overflow-x: auto; margin: 10px 0 0; padding: 15px; background: var(--code); color: var(--code-ink); border-radius: 13px; font: 400 12px/1.65 "IBM Plex Mono", monospace; white-space: pre-wrap; word-break: break-word; }
+    .approval-card { margin-top: 14px; padding: 17px; background: var(--warn-soft); border-radius: 14px; }
+    .approval-card h3 { margin: 0 0 6px; font-size: 16px; }
+    .approval-card p { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .approval-list { display: grid; gap: 7px; margin-bottom: 14px; }
+    .approval-item { display: flex; justify-content: space-between; gap: 10px; padding: 9px 10px; background: color-mix(in srgb, var(--surface) 70%, transparent); border-radius: 9px; font-size: 12px; }
+    .approval-item span:last-child { color: var(--muted); font-family: "IBM Plex Mono", monospace; }
+    .demo-actions { display: flex; flex-wrap: wrap; gap: 9px; padding-top: 17px; border-top: 1px solid var(--line); }
+    .demo-note { margin: 16px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .architecture h1 { max-width: 830px; }
+    .flow { margin-top: 42px; display: grid; grid-template-columns: .8fr 34px 1.05fr 34px 1fr 34px .95fr; align-items: center; }
+    .node { border: 1px solid var(--line); background: var(--surface); border-radius: 18px; padding: 20px; min-height: 168px; }
+    .node.router-node { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .node small { font: 500 10px/1 "IBM Plex Mono", monospace; color: var(--accent); }
+    .node h3 { margin: 27px 0 8px; font-size: 20px; }
+    .node p { margin: 0; color: var(--muted); line-height: 1.45; font-size: 13px; }
+    .router-node p { color: color-mix(in srgb, var(--bg) 70%, transparent); }
+    .arrow { text-align: center; color: var(--accent); font-size: 22px; }
+    .specialists { display: grid; gap: 8px; }
+    .mini-node { border: 1px solid var(--line); background: var(--surface); padding: 11px 12px; border-radius: 11px; display: flex; justify-content: space-between; align-items: center; gap: 9px; }
+    .mini-node strong { font-size: 13px; }
+    .mini-node span { color: var(--muted); font: 400 9px/1 "IBM Plex Mono", monospace; }
+    .principles { margin-top: 52px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; border-top: 1px solid var(--line); padding-top: 24px; }
+    .principle h3 { margin: 0 0 8px; font-size: 16px; }
+    .principle p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
+    .memory-layout { margin-top: 42px; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); gap: 16px; align-items: start; }
+    .memory-stack, .memory-policy { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius-md); }
+    .memory-stack { overflow: hidden; }
+    .memory-layer { display: grid; grid-template-columns: 44px minmax(0,1fr) auto; gap: 15px; align-items: start; padding: 22px; border-bottom: 1px solid var(--line); }
+    .memory-layer:last-child { border-bottom: 0; }
+    .memory-index { width: 38px; height: 38px; border: 1px solid color-mix(in srgb, var(--gold) 42%, var(--line)); color: var(--gold); border-radius: 50%; display: grid; place-items: center; font: 500 10px/1 "IBM Plex Mono", monospace; }
+    .memory-layer h2 { margin: 1px 0 7px; font-size: 19px; letter-spacing: -.02em; }
+    .memory-layer p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .memory-state { color: var(--muted); background: var(--surface-2); border-radius: 999px; padding: 6px 9px; white-space: nowrap; font: 500 9px/1 "IBM Plex Mono", monospace; }
+    .memory-state.durable { color: color-mix(in srgb, var(--ink) 70%, var(--gold)); background: var(--gold-soft); }
+    .memory-policy { padding: 23px; }
+    .memory-policy > small, .memory-empty small { color: var(--gold); font: 500 10px/1 "IBM Plex Mono", monospace; letter-spacing: .06em; }
+    .memory-policy h2 { margin: 9px 0 18px; font-size: 22px; letter-spacing: -.025em; }
+    .policy-list { display: grid; gap: 14px; }
+    .policy-item { display: grid; grid-template-columns: 18px minmax(0,1fr); gap: 10px; align-items: start; }
+    .policy-mark { width: 16px; height: 16px; margin-top: 2px; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); display: grid; place-items: center; font-size: 10px; }
+    .policy-item strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .policy-item span:last-child { display: block; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .memory-empty { margin-top: 16px; padding: 20px 22px; border: 1px dashed color-mix(in srgb, var(--gold) 45%, var(--line)); border-radius: var(--radius-md); background: color-mix(in srgb, var(--gold-soft) 42%, transparent); }
+    .memory-empty h2 { margin: 8px 0 6px; font-size: 17px; }
+    .memory-empty p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .learning-loop { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 24px; }
+    .learning-loop h2 { margin: 0 0 16px; font-size: 22px; letter-spacing: -.025em; }
+    .loop-track { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+    .loop-step { min-height: 102px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .loop-step span { color: var(--gold); font: 500 9px/1 "IBM Plex Mono", monospace; }
+    .loop-step strong { display: block; margin-top: 18px; font-size: 13px; }
+    .loop-step p { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .proof-intro { max-width: 820px; }
+    .proof-hero { margin-top: 36px; padding: 26px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; background: var(--night); color: #fff5df; border: 1px solid color-mix(in srgb, var(--gold) 56%, var(--night)); border-radius: var(--radius-md); box-shadow: var(--shadow); }
+    .proof-hero > div { max-width: 690px; }
+    .proof-hero h2 { margin: 7px 0 8px; font-size: 26px; letter-spacing: -.03em; }
+    .proof-hero p { margin: 0; color: #d3c9b7; line-height: 1.55; }
+    .proof-number { color: var(--gold-bright); font: 500 10px/1 "IBM Plex Mono", monospace; letter-spacing: .08em; }
+    .proof-layout { margin-top: 16px; display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr); gap: 16px; align-items: start; }
+    .proof-ledger { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); overflow: hidden; }
+    .proof-row { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 15px; align-items: start; padding: 21px 22px; border-bottom: 1px solid var(--line); }
+    .proof-row:last-child { border-bottom: 0; }
+    .proof-row .proof-number { width: 31px; height: 31px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--gold) 38%, var(--line)); border-radius: 50%; color: var(--gold); }
+    .proof-row h2 { margin: 1px 0 6px; font-size: 17px; letter-spacing: -.02em; }
+    .proof-row p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.52; }
+    .evidence-state { margin-top: 3px; padding: 6px 8px; border-radius: 999px; background: var(--good-soft); color: var(--good); white-space: nowrap; font: 500 9px/1 "IBM Plex Mono", monospace; }
+    .evidence-state.pending { background: var(--warn-soft); color: var(--warn); }
+    .evidence-panel { display: grid; gap: 12px; }
+    .benchmark-block, .study-block, .package-block { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); padding: 20px; }
+    .benchmark-block > small, .study-block > small, .package-block > small { color: var(--gold); font: 500 9px/1 "IBM Plex Mono", monospace; letter-spacing: .07em; }
+    .benchmark-block h2, .study-block h2 { margin: 7px 0 15px; font-size: 20px; letter-spacing: -.02em; }
+    .benchmark-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .benchmark-grid div { padding: 12px; background: var(--surface); }
+    .benchmark-grid strong, .benchmark-grid span { display: block; }
+    .benchmark-grid strong { font-size: 21px; }
+    .benchmark-grid span { margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .curve-empty { position: relative; margin-top: 16px; height: 156px; border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); background: repeating-linear-gradient(to top, transparent 0, transparent 38px, color-mix(in srgb, var(--line) 62%, transparent) 39px); }
+    .curve-empty::after { content: ""; position: absolute; left: 18%; right: 14%; bottom: 34px; height: 2px; background: repeating-linear-gradient(90deg, var(--gold) 0 7px, transparent 7px 13px); transform: rotate(-8deg); transform-origin: left center; opacity: .42; }
+    .curve-empty p { position: absolute; inset: 52px 12px auto; margin: 0; padding: 7px; text-align: center; background: color-mix(in srgb, var(--surface) 90%, transparent); color: var(--muted); font-size: 11px; }
+    .curve-axis { position: absolute; inset: 0; color: var(--muted); font: 400 8px/1 "IBM Plex Mono", monospace; }
+    .curve-axis span:nth-child(1) { position: absolute; top: 6px; left: 6px; }
+    .curve-axis span:nth-child(2) { position: absolute; bottom: -15px; left: 12%; }
+    .curve-axis span:nth-child(3) { position: absolute; bottom: -15px; right: 0; }
+    .evidence-note { margin: 24px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .study-block ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .study-block li { position: relative; padding-left: 15px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .study-block li::before { content: ""; position: absolute; left: 0; top: 6px; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+    .package-block { display: grid; gap: 11px; }
+    .package-item { display: grid; gap: 3px; padding-top: 10px; border-top: 1px solid var(--line); }
+    .package-item strong { font-size: 13px; }
+    .package-item span { color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 14px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); border-radius: 10px; padding: 10px 14px; font-size: 12px; transition: opacity .18s ease, transform .18s ease; z-index: 20; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    :focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    @media (max-width: 1050px) {
+      .flow { grid-template-columns: 1fr; gap: 10px; }
+      .arrow { transform: rotate(90deg); }
+      .principles { grid-template-columns: repeat(2, 1fr); }
+      .memory-layout, .proof-layout { grid-template-columns: 1fr; }
+      .loop-track { grid-template-columns: repeat(3, 1fr); }
+      .evidence-panel { grid-template-columns: 1.15fr .85fr; }
+      .package-block { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); }
+      .package-block > small { grid-column: 1 / -1; }
+    }
+    @media (max-width: 860px) {
+      body { background: var(--bg); }
+      .app { grid-template-columns: 1fr; }
+      .rail { position: static; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; }
+      .new-button { width: auto; padding: 10px 12px; gap: 12px; }
+      .rail-section { min-width: 0; }
+      .rail-section h2, .rail-bottom { display: none; }
+      .agent-list { grid-template-columns: repeat(7, minmax(76px,1fr)); gap: 3px; }
+      .agent { grid-template-columns: 8px 1fr; padding: 8px 6px; gap: 6px; }
+      .agent small { display: none; }
+      .topbar { height: 58px; padding: 0 18px; }
+      .content { width: min(100% - 32px, 760px); padding: 42px 0 50px; }
+      .demo-shell { grid-template-columns: 1fr; }
+      .demo-side { border-right: 0; border-bottom: 1px solid var(--line); }
+      .demo-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .demo-step { display: block; margin: 0; font-size: 11px; }
+      .demo-step .marker { margin-bottom: 6px; }
+    }
+    @media (max-width: 620px) {
+      .rail { grid-template-columns: 1fr; }
+      .new-button { justify-content: center; }
+      .new-button svg { display: none; }
+      .agent-list { grid-template-columns: repeat(3, 1fr); }
+      .status span:last-child { display: none; }
+      .view-tab { padding: 8px; font-size: 13px; }
+      .content { padding-top: 34px; }
+      h1 { font-size: 44px; }
+      .lede { font-size: 16px; }
+      .suggestions, .cap-grid { grid-template-columns: 1fr; }
+      .suggestion { min-height: 0; }
+      .cap-primary { min-height: 250px; border-radius: var(--radius-md); }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .composer-actions { align-items: stretch; padding-left: 14px; }
+      .mode-label { display: none; }
+      .run-button { width: 100%; }
+      .plan-head, .demo-objective { flex-direction: column; }
+      .plan-step { grid-template-columns: 34px 1fr; }
+      .step-owner { grid-column: 2; padding-top: 0; }
+      .demo-main { padding: 20px; }
+      .demo-steps { grid-template-columns: repeat(2, 1fr); }
+      .log-entry { grid-template-columns: 1fr; gap: 5px; }
+      .principles { grid-template-columns: 1fr; }
+      .memory-layer { grid-template-columns: 38px minmax(0,1fr); padding: 18px; }
+      .memory-state { grid-column: 2; justify-self: start; }
+      .loop-track { grid-template-columns: 1fr 1fr; }
+      .loop-step { min-height: 94px; }
+      .approval-item { align-items: flex-start; flex-direction: column; }
+      .proof-hero { align-items: flex-start; flex-direction: column; padding: 22px; }
+      .proof-hero .demo-button { width: 100%; }
+      .proof-row { grid-template-columns: 34px minmax(0,1fr); padding: 18px; }
+      .evidence-state { grid-column: 2; justify-self: start; }
+      .evidence-panel { grid-template-columns: 1fr; }
+      .package-block { grid-column: auto; grid-template-columns: 1fr; }
+      .package-block > small { grid-column: auto; }
+    }
+    /* Conversation-first workspace */
+    .app { grid-template-columns: 276px minmax(0, 1fr); }
+    .rail { background: var(--surface); gap: 14px; padding: 16px 12px; }
+    .new-button { min-height: 46px; padding: 12px 13px; border: 0; background: var(--surface-2); color: var(--ink); }
+    .history-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; background: var(--surface-2); border-radius: 10px; }
+    .history-tab { border: 0; background: transparent; color: var(--muted); padding: 8px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .history-tab.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 5px rgba(0,0,0,.08); }
+    .history-panel { display: none; min-height: 0; overflow: hidden; }
+    .history-panel.visible { display: block; }
+    .history-panel h2 { margin: 10px 8px 8px; color: var(--muted); font: 500 10px/1.2 "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .history-list { display: grid; gap: 3px; }
+    .history-empty { margin: 6px 8px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .history-item { width: 100%; border: 0; background: transparent; color: var(--ink); text-align: left; padding: 10px 9px; border-radius: 9px; cursor: pointer; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: center; }
+    .history-item:hover, .history-item.active { background: var(--surface-2); }
+    .history-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+    .history-meta { color: var(--muted); font: 500 9px/1 "IBM Plex Mono", monospace; }
+    .history-item.running .history-meta { color: var(--accent); }
+    .network-status { border-top: 1px solid var(--line); padding: 14px 7px 0; display: grid; grid-template-columns: 8px 1fr; gap: 10px; align-items: start; }
+    .network-status strong, .network-status span { display: block; }
+    .network-status strong { font-size: 12px; }
+    .network-status span { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .session-note { margin: 10px 7px 0; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .topbar { height: 60px; }
+    #workspaceView { width: min(880px, calc(100% - 40px)); padding-top: 34px; }
+    .chat-feed { min-height: 390px; display: flex; flex-direction: column; justify-content: center; }
+    .welcome-state { text-align: center; max-width: 720px; margin: 0 auto; width: 100%; }
+    .welcome-state h1 { margin: 5px auto 0; font-size: clamp(34px, 5vw, 52px); line-height: 1.05; letter-spacing: -.045em; }
+    .welcome-state .lede { margin: 15px auto 0; max-width: 590px; font-size: 16px; }
+    .bull-stage { position: relative; width: 210px; height: 165px; margin: 0 auto 4px; display: grid; place-items: center; }
+    .bull-aura { position: absolute; inset: 29px 20px 9px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 10%, transparent); transform: scale(.92); transition: background .25s ease, transform .25s ease; }
+    .bull { position: relative; width: 190px; height: 150px; overflow: visible; transform-origin: 50% 85%; animation: bullBreathe 3.4s ease-in-out infinite; }
+    .horn { fill: none; stroke: var(--ink); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+    .ear { fill: var(--surface-3); stroke: var(--ink); stroke-width: 5; stroke-linejoin: round; }
+    .head-shape { fill: var(--ink); stroke: var(--ink); stroke-width: 3; }
+    .forehead-mark { fill: var(--accent); opacity: .8; }
+    .brow { fill: none; stroke: var(--surface); stroke-width: 5; stroke-linecap: round; transform-box: fill-box; transform-origin: center; transition: transform .2s ease, stroke .2s ease; }
+    .eye { fill: var(--surface); transform-box: fill-box; transform-origin: center; animation: bullBlink 5s infinite; }
+    .pupil { fill: var(--ink); transition: transform .18s ease; }
+    .muzzle { fill: var(--surface-2); }
+    .nostril { fill: var(--ink); transform-box: fill-box; transform-origin: center; transition: transform .2s ease; }
+    .mouth { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+    .bull-stage[data-state="working"] .bull-aura { background: color-mix(in srgb, var(--accent) 24%, transparent); transform: scale(1.05); }
+    .bull-expression { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+    .charge-brow, .charge-eye { position: absolute; opacity: 0; transition: opacity .16s ease, transform .16s ease; }
+    .charge-brow { top: 51px; width: 34px; height: 7px; border-radius: 999px; background: #061927; box-shadow: 0 0 9px rgba(0,0,0,.28); }
+    .charge-brow.left { left: 41px; transform: rotate(8deg) translateY(-5px); }
+    .charge-brow.right { right: 41px; transform: rotate(-8deg) translateY(-5px); }
+    .charge-eye { top: 65px; width: 15px; height: 6px; border-radius: 50%; background: #ff653f; box-shadow: 0 0 12px #ff653f; }
+    .charge-eye.left { left: 58px; transform: scaleX(.35); }
+    .charge-eye.right { right: 58px; transform: scaleX(.35); }
+    .bull-stage[data-state="working"] .bull { animation: bullCharge .32s ease-in-out infinite alternate; filter: drop-shadow(0 0 17px color-mix(in srgb, #ff653f 62%, transparent)); }
+    .bull-stage[data-state="working"] .charge-brow,
+    .bull-stage[data-state="working"] .charge-eye { opacity: 1; }
+    .bull-stage[data-state="working"] .charge-brow.left { transform: rotate(21deg) translateY(0); }
+    .bull-stage[data-state="working"] .charge-brow.right { transform: rotate(-21deg) translateY(0); }
+    .bull-stage[data-state="working"] .charge-eye.left,
+    .bull-stage[data-state="working"] .charge-eye.right { transform: scaleX(1); }
+    @keyframes bullBreathe { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-3px) scale(1.015); } }
+    @keyframes bullBlink { 0%, 45%, 49%, 100% { transform: scaleY(1); } 47% { transform: scaleY(.08); } }
+    @keyframes bullCharge { from { transform: translate(-2px, 3px) rotate(-1deg) scale(1.02); } to { transform: translate(2px, -1px) rotate(1deg) scale(1.06); } }
+    .composer { margin-top: 22px; border-radius: 22px; box-shadow: 0 10px 32px rgba(42,38,29,.08); }
+    .composer textarea { min-height: 80px; max-height: 180px; padding: 18px 20px 7px; resize: none; font-size: 15px; }
+    .composer-actions { padding: 8px 10px 10px 16px; }
+    .run-button { min-height: 40px; border-radius: 12px; padding: 10px 14px; }
+    .suggestions { max-width: 760px; margin: 12px auto 0; }
+    .suggestion { min-height: 76px; }
+    .conversation { display: none; width: 100%; }
+    .conversation.visible { display: block; }
+    .chat-turn { display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 13px; padding: 17px 0; border-bottom: 1px solid var(--line); text-align: left; }
+    .chat-avatar { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: var(--surface-2); color: var(--ink); font: 600 11px/1 "IBM Plex Mono", monospace; }
+    .chat-avatar.taurus { background: var(--ink); color: var(--bg); }
+    .chat-turn h3 { margin: 2px 0 6px; font-size: 14px; }
+    .chat-turn p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
+    .chat-turn .working-line { color: var(--accent); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+    #workspaceView.has-conversation .chat-feed { min-height: 0; display: block; }
+    #workspaceView.has-conversation .welcome-state { max-width: 350px; margin-bottom: 22px; }
+    #workspaceView.has-conversation .welcome-state h1, #workspaceView.has-conversation .welcome-state .lede { display: none; }
+    #workspaceView.has-conversation .bull-stage { transform: scale(.68); height: 112px; margin-top: -20px; margin-bottom: -14px; }
+    #workspaceView.has-conversation .conversation { display: block; }
+    #workspaceView.has-conversation .suggestions { display: none; }
+    #workspaceView.has-conversation .capabilities { display: none; }
+    #workspaceView .plan-preview { margin-top: 20px; }
+    #workspaceView.has-conversation .plan-card { box-shadow: none; }
+
+    @media (max-width: 860px) {
+      .app { grid-template-columns: 1fr; }
+      .rail { padding: 10px 12px; grid-template-columns: auto minmax(180px, 1fr); gap: 9px; }
+      .history-tabs { align-self: center; }
+      .history-panel { display: none; grid-column: 1 / -1; max-height: 104px; overflow: auto; border-top: 1px solid var(--line); padding-top: 5px; }
+      .history-panel.visible { display: block; }
+      .history-panel h2 { display: none; }
+      .history-list { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .rail-bottom { display: none !important; }
+      .new-button { width: auto; }
+      #workspaceView { width: min(100% - 28px, 760px); padding-top: 26px; }
+    }
+    @media (max-width: 620px) {
+      .rail { grid-template-columns: 1fr 1fr; }
+      .new-button { justify-content: center; }
+      .topbar { overflow: hidden; }
+      .view-tabs { min-width: 0; }
+      .view-tabs { gap: 2px; }
+      .view-tab { padding-inline: 6px; font-size: 11px; white-space: nowrap; }
+      .status { display: none; }
+      .bull-stage { width: 180px; height: 145px; }
+      .bull { width: 165px; }
+      .welcome-state h1 { font-size: 36px; }
+      .suggestions { grid-template-columns: 1fr; }
+      .suggestion:nth-child(n+3) { display: none; }
+      .composer-actions { align-items: center; }
+      .mode-label { display: flex; font-size: 9px; }
+      .run-button { width: auto; }
+      .plan-head { padding: 20px; }
+      .plan-steps { padding-inline: 20px; }
+    }
+    /* Premium Taurus identity and quieter home */
+    :root {
+      --gold: #b7822e;
+      --gold-bright: #e5b85e;
+      --gold-soft: #f4e8cf;
+      --night: #0b0d12;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --gold: #d6a852; --gold-bright: #f3cf80; --gold-soft: #352b1b; }
+    }
+    .capabilities { display: none; }
+    .welcome-state { max-width: 680px; }
+    .bull-stage {
+      width: 210px;
+      height: 174px;
+      margin-bottom: 12px;
+      border-radius: 48% 48% 42% 42%;
+      isolation: isolate;
+    }
+    .bull-stage::before,
+    .bull-stage::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      pointer-events: none;
+      opacity: .78;
+    }
+    .bull-stage::before {
+      z-index: -1;
+      top: 12px;
+      width: 152px;
+      height: 152px;
+      transform: translateX(-50%) rotate(45deg);
+      border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+      border-radius: 28px;
+    }
+    .bull-stage::after {
+      bottom: 3px;
+      width: 72px;
+      height: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+      box-shadow: 0 0 18px color-mix(in srgb, var(--gold-bright) 38%, transparent);
+    }
+    .bull-aura {
+      inset: 13px -5px 0;
+      background: radial-gradient(circle, color-mix(in srgb, var(--gold-bright) 17%, transparent), transparent 64%);
+      filter: blur(8px);
+    }
+    .bull {
+      grid-area: 1 / 1;
+      width: 194px;
+      height: 166px;
+      border-radius: 44% 44% 34% 34%;
+      object-fit: cover;
+      object-position: 50% 48%;
+      animation: bullBreathe 3.8s ease-in-out infinite;
+      filter: saturate(.94) contrast(1.04) drop-shadow(0 12px 24px rgba(42, 28, 9, .28));
+      transition: opacity .18s ease, filter .22s ease;
+    }
+    .bull-calm { opacity: 1; }
+    .bull-angry { opacity: 0; }
+    .bull-stage[data-state="working"]::before { border-color: color-mix(in srgb, #ee7b37 62%, transparent); }
+    .bull-stage[data-state="working"]::after { background: linear-gradient(90deg, transparent, #ff8b42, transparent); box-shadow: 0 0 24px rgba(255,111,47,.72); }
+    .bull-stage[data-state="working"] .bull {
+      animation: bullCharge .34s ease-in-out infinite alternate;
+      filter: saturate(1.08) contrast(1.08) drop-shadow(0 0 20px rgba(255,101,63,.58));
+    }
+    .bull-stage[data-state="working"] .bull-calm { opacity: 0; }
+    .bull-stage[data-state="working"] .bull-angry { opacity: 1; }
+    .bull-stage[data-state="working"] .bull-aura { background: radial-gradient(circle, rgba(255,101,63,.27), transparent 66%); }
+    .welcome-state h1 { font-size: clamp(34px, 5vw, 50px); font-weight: 600; letter-spacing: -.047em; }
+    .composer { border-color: color-mix(in srgb, var(--gold) 30%, var(--line)); box-shadow: 0 18px 54px rgba(24,19,11,.11); }
+    .composer:focus-within { border-color: var(--gold); box-shadow: 0 18px 58px rgba(86,59,18,.15), 0 0 0 3px color-mix(in srgb, var(--gold) 12%, transparent); }
+    .run-button { background: var(--night); color: #f6deb0; border: 1px solid color-mix(in srgb, var(--gold-bright) 38%, transparent); }
+    .run-button:not(:disabled):hover { background: #16130d; }
+    .mode-label svg, .eyebrow, .cap-number { color: var(--gold); }
+    .route-badge { color: color-mix(in srgb, var(--ink) 78%, var(--gold)); background: var(--gold-soft); border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent); }
+    .chat-avatar.taurus { background: var(--night); color: var(--gold-bright); border: 1px solid color-mix(in srgb, var(--gold-bright) 32%, transparent); }
+    .architecture .intro { max-width: 760px; }
+    .architecture .flow { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+    .architecture .node { min-height: 154px; padding: 18px 15px; position: relative; overflow: hidden; }
+    .architecture .node::after { content: ""; position: absolute; inset: auto 0 0; height: 3px; background: var(--gold); opacity: .72; }
+    .architecture .node h3 { margin: 36px 0 8px; font-size: 18px; }
+    .architecture .node p { font-size: 12px; }
+    .architecture .node.router-node { background: var(--night); color: #fff4dd; border-color: color-mix(in srgb, var(--gold) 50%, var(--night)); }
+    .architecture .node.router-node p { color: #d1c7b3; }
+    @media (max-width: 1050px) {
+      .architecture .flow { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .suggestions { grid-template-columns: 1fr; }
+      .architecture .flow { grid-template-columns: 1fr; }
+      .architecture .node { min-height: 128px; }
+      .architecture .node h3 { margin-top: 24px; }
+    }
+    /* Final product polish */
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --surface-2: #eeece6;
+      --surface-3: #e3e0d8;
+      --line: #dedbd2;
+      --ink: #171714;
+      --muted: #77736a;
+      --shadow: 0 22px 64px rgba(34, 28, 18, .09);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #10110f;
+        --surface: #181916;
+        --surface-2: #23231f;
+        --surface-3: #302f29;
+        --line: #36362f;
+        --ink: #f3f0e7;
+        --muted: #a9a59b;
+        --shadow: 0 24px 68px rgba(0, 0, 0, .34);
+      }
+    }
+    body { background: var(--bg); }
+    .app { width: 100%; grid-template-columns: 260px minmax(0, 1fr); }
+    .rail {
+      padding: 18px 14px 16px;
+      gap: 16px;
+      background: color-mix(in srgb, var(--surface) 94%, var(--bg));
+      box-shadow: 12px 0 34px rgba(30, 26, 19, .025);
+      z-index: 2;
+    }
+    .new-button {
+      min-height: 44px;
+      padding: 11px 12px 11px 14px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      background: var(--ink);
+      color: var(--bg);
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .new-button:hover { background: color-mix(in srgb, var(--ink) 90%, var(--gold)); }
+    .new-button:active { transform: translateY(1px); }
+    .history-tabs { border-radius: 11px; }
+    .history-tab { min-height: 32px; transition: background .18s ease, color .18s ease; }
+    .history-item { min-height: 40px; transition: background .16s ease; }
+    .network-status { padding-top: 16px; }
+    .session-note { display: none; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: 64px;
+      padding: 0 32px;
+      background: color-mix(in srgb, var(--bg) 96%, transparent);
+      border-color: color-mix(in srgb, var(--line) 82%, transparent);
+    }
+    .view-tabs { align-self: stretch; align-items: center; gap: 2px; }
+    .view-tab {
+      position: relative;
+      min-height: 40px;
+      padding: 9px 12px;
+      border-radius: 0;
+      transition: color .18s ease;
+    }
+    .view-tab::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -12px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--gold);
+      opacity: 0;
+      transform: scaleX(.4);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .view-tab:hover { color: var(--ink); }
+    .view-tab.active { color: var(--ink); background: transparent; }
+    .view-tab.active::after { opacity: 1; transform: scaleX(1); }
+    .status { gap: 9px; letter-spacing: .02em; }
+    .status .pulse { width: 7px; height: 7px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--good) 12%, transparent); }
+    #workspaceView {
+      width: min(900px, calc(100% - 48px));
+      min-height: calc(100vh - 64px);
+      padding: clamp(34px, 6vh, 68px) 0 58px;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+    }
+    #workspaceView.visible { display: flex; }
+    #workspaceView.has-conversation { justify-content: flex-start; }
+    .chat-feed { min-height: 318px; }
+    .welcome-state { max-width: 700px; }
+    .bull-stage { width: 190px; height: 158px; margin-bottom: 6px; }
+    .bull-stage::before { width: 138px; height: 138px; border-radius: 26px; }
+    .bull { width: 178px; height: 152px; }
+    .welcome-state h1 {
+      max-width: none;
+      font-size: clamp(37px, 4.5vw, 52px);
+      line-height: 1.04;
+      letter-spacing: -.05em;
+    }
+    .composer {
+      width: min(780px, 100%);
+      margin: 26px auto 0;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .composer textarea {
+      min-height: 76px;
+      padding: 19px 20px 8px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .composer-actions { min-height: 54px; padding: 8px 10px 10px 18px; }
+    .mode-label { letter-spacing: .025em; }
+    .run-button {
+      min-width: 92px;
+      min-height: 42px;
+      border-radius: 11px;
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .run-button:not(:disabled):hover { border-color: color-mix(in srgb, var(--gold-bright) 68%, transparent); }
+    .run-button:not(:disabled):active { transform: translateY(1px); }
+    .plan-preview { width: min(820px, 100%); margin-inline: auto; }
+    .plan-card { border-radius: 20px; }
+    .chat-turn { padding: 18px 2px; }
+    #workspaceView.has-conversation .bull-stage { transform: scale(.62); }
+    .content:not(#workspaceView) { width: min(1080px, calc(100% - 56px)); padding-top: 52px; }
+    .eyebrow { letter-spacing: .06em; }
+    .demo-shell, .proof-hero, .proof-ledger, .benchmark-block, .study-block, .package-block,
+    .memory-stack, .memory-policy { box-shadow: 0 12px 38px rgba(34, 28, 18, .045); }
+    .secondary-button { transition: background .18s ease, border-color .18s ease; }
+    .secondary-button:hover { background: var(--surface-2); border-color: color-mix(in srgb, var(--gold) 38%, var(--line)); }
+    .toast { box-shadow: 0 14px 38px rgba(0,0,0,.2); }
+    @media (max-width: 860px) {
+      .app { grid-template-columns: 1fr; }
+      .rail { padding: 10px 12px; grid-template-columns: auto minmax(180px, 1fr); box-shadow: none; }
+      .topbar { top: 0; padding: 0 18px; }
+      #workspaceView { min-height: calc(100vh - 126px); width: min(100% - 32px, 760px); padding-top: 30px; }
+      .content:not(#workspaceView) { width: min(100% - 32px, 760px); padding-top: 38px; }
+      .view-tab::after { bottom: -8px; }
+    }
+    @media (max-width: 620px) {
+      .rail { padding: 9px 10px; gap: 8px; }
+      .new-button { min-height: 38px; padding-block: 8px; }
+      .history-tabs { min-height: 38px; }
+      .history-panel.visible { max-height: 84px; }
+      .topbar { height: 54px; padding: 0 12px; }
+      .view-tabs { width: 100%; justify-content: space-between; }
+      .view-tab { min-height: 36px; padding-inline: 5px; font-size: 11px; }
+      .view-tab::after { left: 5px; right: 5px; bottom: -9px; }
+      #workspaceView { min-height: calc(100vh - 146px); width: min(100% - 24px, 760px); padding: 24px 0 34px; }
+      .chat-feed { min-height: 276px; }
+      .bull-stage { width: 164px; height: 134px; }
+      .bull-stage::before { width: 116px; height: 116px; border-radius: 22px; }
+      .bull { width: 154px; height: 130px; }
+      .welcome-state h1 { font-size: clamp(32px, 10vw, 40px); line-height: 1.07; }
+      .composer { margin-top: 18px; border-radius: 17px; }
+      .composer textarea { min-height: 68px; padding: 16px 16px 6px; }
+      .composer-actions { min-height: 50px; padding: 7px 8px 8px 14px; }
+      .run-button { min-width: 82px; min-height: 39px; }
+      .content:not(#workspaceView) { width: min(100% - 24px, 760px); padding: 30px 0 40px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+    }
+  
+    /* --- REAL BACKEND RESULT STYLES (additive; decided UI untouched) --- */
+    .feedback-input {
+      width: 100%; margin-top: 8px; padding: 10px 12px;
+      border: 1px solid var(--line); border-radius: 10px;
+      background: var(--surface); color: var(--ink);
+      font: inherit; font-size: 13px;
+    }
+    .feedback-input::placeholder { color: var(--muted); }
+    .real-result { margin-top: 10px; }
+    .router-badge-real {
+      display: inline-block; margin: 6px 0 10px; padding: 5px 10px;
+      border-radius: 999px; font: 600 11px/1.3 "IBM Plex Mono", monospace;
+      color: var(--gold-bright, #e5b85e); background: var(--night, #0b0d12);
+      border: 1px solid color-mix(in srgb, var(--gold, #b7822e) 55%, transparent);
+    }
+    .result-body { white-space: pre-wrap; word-break: break-word; line-height: 1.6; font-size: 14px; }
+    .result-body pre {
+      white-space: pre-wrap; word-break: break-word; background: var(--code);
+      color: var(--code-ink); padding: 12px 14px; border-radius: 10px;
+      font: 400 12.5px/1.55 "IBM Plex Mono", monospace; overflow-x: auto;
+    }
+    .result-body code { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; }
+    .learned-block {
+      margin-top: 12px; padding: 12px 14px; border: 1px solid var(--line);
+      border-radius: 12px; background: var(--surface-2);
+    }
+    .learned-block h4 { margin: 0 0 6px; font-size: 13px; }
+    .learned-block ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.55; }
+    .trace-details { margin-top: 12px; font-size: 12.5px; }
+    .trace-details summary { cursor: pointer; font-weight: 600; }
+    .trace-details pre {
+      white-space: pre-wrap; word-break: break-word; background: var(--code);
+      color: var(--code-ink); padding: 10px 12px; border-radius: 10px;
+      font: 400 11.5px/1.5 "IBM Plex Mono", monospace; max-height: 260px; overflow: auto;
+    }
+    .error-turn { color: #b42318; }
+    .memory-real-list { margin: 10px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.6; }
+    .memory-real-list li { margin-bottom: 4px; }
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail" aria-label="Conversation and task history">
+      <button class="new-button" id="newRequest">
+        <span>New chat</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+
+      <div class="history-tabs" role="tablist" aria-label="History type">
+        <button class="history-tab active" role="tab" aria-selected="true" data-history="chats">Chats</button>
+        <button class="history-tab" role="tab" aria-selected="false" data-history="tasks">Tasks</button>
+      </div>
+
+      <section class="history-panel visible" id="chatsHistory" aria-label="Chat history">
+        <h2>This session</h2>
+        <div class="history-list" id="chatHistoryList">
+          <p class="history-empty">Your conversations will appear here after you send a prompt.</p>
+        </div>
+      </section>
+
+      <section class="history-panel" id="tasksHistory" aria-label="Task history">
+        <h2>Agent runs</h2>
+        <div class="history-list" id="taskHistoryList">
+          <p class="history-empty">Completed and in-progress tasks will appear here.</p>
+        </div>
+      </section>
+
+      <div class="rail-bottom">
+        <div class="network-status"><i class="dot router"></i><div><strong>Agentic mode v4</strong><span>7 agents · selective memory</span></div></div>
+        <p class="session-note">Chat history is session-only. The Memory view previews the persistent v4 policy.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <nav class="view-tabs" aria-label="Preview sections">
+          <button class="view-tab active" data-view="workspace">Workspace</button>
+          <button class="view-tab" data-view="demo">Demo</button>
+          <button class="view-tab" data-view="memory">Memory</button>
+          <button class="view-tab" data-view="proof">Proof</button>
+          <button class="view-tab" data-view="architecture">System</button>
+        </nav>
+        <div class="status"><i class="pulse"></i><span>Live agentic backend • Learning + memory</span></div>
+      </header>
+
+      <section class="content view visible" id="workspaceView">
+        <div class="chat-feed" id="chatFeed" aria-live="polite">
+          <section class="welcome-state" id="welcomeState">
+            <div class="bull-stage" id="bullStage" data-state="calm" aria-label="Taurus is ready">
+              <div class="bull-aura"></div>
+              <img class="bull bull-calm" src="data:image/webp;base64,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" alt="Sculpted gold Taurus bull mark, calm and attentive" />
+              <img class="bull bull-angry" src="data:image/webp;base64,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" alt="" aria-hidden="true" />
+            </div>
+            <h1>Ask anything and do anything</h1>
+          </section>
+          <div class="conversation" id="conversation"></div>
+        </div>
+
+        <section class="composer" aria-label="Chat composer">
+          <textarea id="prompt" aria-label="Message Taurus" placeholder="Message Taurus…"></textarea>
+          <input class="feedback-input" id="feedbackInput" type="text" placeholder="Feedback / correction on last answer? (optional — helps Taurus learn)" aria-label="Feedback or correction on last answer" />
+          <div class="composer-actions">
+            <span class="mode-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16M4 12h10M4 19h7"/><circle cx="18" cy="12" r="2"/><circle cx="15" cy="19" r="2"/></svg>
+              AUTO-ROUTING ON
+            </span>
+            <button class="run-button" id="runPreview" aria-label="Send message">
+              <span>Send</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 12 14-7-4 14-3-6-7-1Z"/></svg>
+            </button>
+          </div>
+        </section>
+
+        <section class="plan-preview" id="planPreview" aria-live="polite">
+          <div class="plan-card">
+            <div class="plan-head">
+              <div><h2>Execution plan</h2><p id="planSummary"></p></div>
+              <div class="route-badges" id="routeBadges"></div>
+            </div>
+            <div class="plan-steps" id="planSteps"></div>
+          </div>
+        </section>
+
+        <section class="capabilities" id="capabilities">
+          <div class="section-head"><h2>Built to choose before it acts</h2><p>AGENTIC LOOP / SEVEN ROLES</p></div>
+          <div class="cap-grid">
+            <article class="cap-primary">
+              <span class="cap-number">01 / UNDERSTAND + ROUTE</span>
+              <div>
+                <h3>From one prompt to the right specialist models.</h3>
+                <p>The v3 routing policy classifies each subtask by capability, then assigns a reasoning model for math, a code model for programming, and a general model for research or communication.</p>
+                <div class="tool-row"><span class="tool">semantic intent</span><span class="tool">model policy</span><span class="tool">task splitting</span><span class="tool">fallback route</span></div>
+              </div>
+            </article>
+            <div class="cap-side">
+              <article class="cap-secondary">
+                <span class="cap-number">02 / CRITIC</span>
+                <h3>Observe, test, repair.</h3>
+                <p>Code, math, citations, and deliverables are checked before the workflow can advance.</p>
+              </article>
+              <article class="cap-secondary">
+                <span class="cap-number">03 / EXECUTOR</span>
+                <h3>Action behind approval.</h3>
+                <p>Gmail drafts, calendar changes, and files remain gated until a human confirms the exact action.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="content view" id="demoView">
+        <div class="intro">
+          <p class="eyebrow">Award demo / one memorable story</p>
+          <h1>One goal. A complete, visible recovery.</h1>
+          <p class="lede">The two-minute story follows a student internship search from intent to verified deliverables. Taurus routes specialist models, catches a broken scoring function, repairs it, pauses for approval, and records evidence for later evaluation.</p>
+        </div>
+
+        <section class="demo-shell" aria-label="Guided agentic demo">
+          <aside class="demo-side">
+            <h2>Run trace</h2>
+            <p>Each stage updates the shared task state.</p>
+            <div class="demo-steps" id="demoSteps">
+              <div class="demo-step active" data-stage="0"><i class="marker">1</i><span>Goal received</span></div>
+              <div class="demo-step" data-stage="1"><i class="marker">2</i><span>Models routed</span></div>
+              <div class="demo-step" data-stage="2"><i class="marker">3</i><span>Plan created</span></div>
+              <div class="demo-step" data-stage="3"><i class="marker">4</i><span>Evidence gathered</span></div>
+              <div class="demo-step" data-stage="4"><i class="marker">5</i><span>Failure repaired</span></div>
+              <div class="demo-step" data-stage="5"><i class="marker">6</i><span>Approval gate</span></div>
+              <div class="demo-step" data-stage="6"><i class="marker">7</i><span>Learn safely</span></div>
+              <div class="demo-step" data-stage="7"><i class="marker">8</i><span>Proof recorded</span></div>
+            </div>
+          </aside>
+          <div class="demo-main">
+            <div class="demo-objective">
+              <div><small>ONE USER PROMPT</small><h2>Find five Agentic AI internships, rank the best fit, draft an outreach email, create a follow-up reminder, and save a sourced report.</h2></div>
+              <button class="secondary-button" id="resetDemo">Reset</button>
+            </div>
+            <div class="demo-log" id="demoLog">
+              <p class="empty-log">The goal is ready. Start the run to see Taurus infer the task types, choose specialist models, recover from a deliberate code failure, and stop before any external action.</p>
+            </div>
+            <div class="demo-actions">
+              <button class="demo-button" id="advanceDemo">Start guided demo</button>
+            </div>
+            <p class="demo-note">Preview only: this walkthrough demonstrates the award story, recovery path, routing audit, and approval design. It does not search live listings, call models, change Gmail or Calendar, save files, or persist memory. The deployed backend supplies those connected actions and the real benchmark evidence shown in Proof lab.</p>
+          </div>
+        </section>
+      </section>
+
+      <section class="content view" id="memoryView">
+        <div class="intro">
+          <p class="eyebrow">Taurus Core / adaptive memory</p>
+          <h1>Remember what matters. Improve from every correction.</h1>
+          <p class="lede">Taurus separates temporary task context from durable, approved memory. It learns from verified outcomes and user corrections without treating every message as a permanent fact.</p>
+        </div>
+
+        <div class="memory-layout">
+          <section class="memory-stack" aria-label="Three memory layers">
+            <article class="memory-layer">
+              <span class="memory-index">01</span>
+              <div><h2>Working memory</h2><p>Keeps the current goal, plan, tool results, and critic feedback together while a task is active. It is cleared when the run closes.</p></div>
+              <span class="memory-state">TASK ONLY</span>
+            </article>
+            <article class="memory-layer">
+              <span class="memory-index">02</span>
+              <div><h2>Important memory</h2><p>Stores only confirmed preferences, stable project facts, decisions, and constraints. Each item keeps its source and can be updated or forgotten.</p></div>
+              <span class="memory-state durable">APPROVAL REQUIRED</span>
+            </article>
+            <article class="memory-layer">
+              <span class="memory-index">03</span>
+              <div><h2>Learning record</h2><p>Turns corrections, failed tool calls, repairs, and outcome scores into better routing and critic rules for similar future tasks.</p></div>
+              <span class="memory-state durable">VERIFIED SIGNALS</span>
+            </article>
+          </section>
+
+          <aside class="memory-policy" aria-label="Memory safety policy">
+            <small>IMPORTANCE FILTER</small>
+            <h2>Selective by design</h2>
+            <div class="policy-list">
+              <div class="policy-item"><i class="policy-mark">✓</i><div><strong>Keep durable value</strong><span>Stable preferences, project decisions, repeated corrections, and explicit “remember this” facts.</span></div></div>
+              <div class="policy-item"><i class="policy-mark">↻</i><div><strong>Retrieve only when relevant</strong><span>Memory is ranked by task, recency, confidence, and source before it enters a plan.</span></div></div>
+              <div class="policy-item"><i class="policy-mark">×</i><div><strong>Reject unsafe memory</strong><span>Passwords, secret keys, one-time codes, speculation, and full chat transcripts are not stored as important memory.</span></div></div>
+            </div>
+          </aside>
+        </div>
+
+        <section class="memory-empty" aria-label="Approved memory state">
+          <small>APPROVED MEMORY</small>
+          <h2>No durable memories in this static preview</h2>
+          <p>The connected Taurus backend would show confirmed memories here with their source, confidence, last use, edit, and forget controls. This preview demonstrates the policy without pretending to save data.</p>
+        </section>
+
+        <section class="learning-loop" aria-label="Self-learning loop">
+          <h2>How Taurus gets better</h2>
+          <div class="loop-track">
+            <article class="loop-step"><span>01</span><strong>Observe</strong><p>Capture the result, tool status, and critic verdict.</p></article>
+            <article class="loop-step"><span>02</span><strong>Detect</strong><p>Find a correction, stable fact, or reusable failure pattern.</p></article>
+            <article class="loop-step"><span>03</span><strong>Judge</strong><p>Score importance, confidence, sensitivity, and lifespan.</p></article>
+            <article class="loop-step"><span>04</span><strong>Confirm</strong><p>Ask before promoting personal data to durable memory.</p></article>
+            <article class="loop-step"><span>05</span><strong>Retrieve</strong><p>Bring back only the memories relevant to the new task.</p></article>
+            <article class="loop-step"><span>06</span><strong>Adapt</strong><p>Improve routing and checks, then measure the next outcome.</p></article>
+          </div>
+        </section>
+      </section>
+
+      <section class="content view" id="proofView">
+        <div class="intro proof-intro">
+          <p class="eyebrow">Evidence over feature count</p>
+          <h1>Turn Taurus into a project judges can verify.</h1>
+          <p class="lede">Eight improvements are organized as one evidence program: a memorable demo, measurable learning, personalized routing, visible recovery, real-user impact, grounded multimodal knowledge, responsible controls, and an award-ready presentation package.</p>
+        </div>
+
+        <section class="proof-hero" aria-label="Taurus award story">
+          <div>
+            <span class="proof-number">01</span>
+            <h2>The two-minute killer story</h2>
+            <p>A student gives one internship goal. Taurus plans it, routes research and scoring work, catches a failed function, repairs it, prepares a sourced report and outreach draft, then stops for approval.</p>
+          </div>
+          <button class="demo-button" id="openAwardDemo">Run the story</button>
+        </section>
+
+        <div class="proof-layout">
+          <section class="proof-ledger" aria-label="Eight award improvements">
+            <article class="proof-row">
+              <span class="proof-number">02</span>
+              <div><h2>Measurable self-learning</h2><p>A fixed 20-task benchmark runs before and after corrections. The same rubric measures route choice, answer quality, tool validity, recovery, and approval behavior.</p></div>
+              <span class="evidence-state">HARNESS DESIGNED</span>
+            </article>
+            <article class="proof-row">
+              <span class="proof-number">03</span>
+              <div><h2>Adaptive routing that learns the user</h2><p>For each task type, Taurus compares verified outcomes by model class and can prefer the route that performs best for that user—without hiding the policy or skipping a fallback.</p></div>
+              <span class="evidence-state">POLICY VISIBLE</span>
+            </article>
+            <article class="proof-row">
+              <span class="proof-number">04</span>
+              <div><h2>Failure and recovery on screen</h2><p>The guided demo intentionally exposes an invalid scoring function. Critic feedback returns it to the code model, the repair is tested, and only then can the workflow advance.</p></div>
+              <span class="evidence-state">IN GUIDED DEMO</span>
+            </article>
+            <article class="proof-row">
+              <span class="proof-number">05</span>
+              <div><h2>Real-user impact study</h2><p>Invite ten students for one week and collect only real outcomes: completed tasks, time saved, recovery rate, and whether they would use Taurus again. No result is shown until evidence exists.</p></div>
+              <span class="evidence-state pending">AWAITING STUDY</span>
+            </article>
+            <article class="proof-row">
+              <span class="proof-number">06</span>
+              <div><h2>Grounded multimodal knowledge</h2><p>The next connected build accepts a PDF or question-paper image, retrieves relevant passages from the user’s notes, cites the source, and sends math or code fragments to the matching specialist.</p></div>
+              <span class="evidence-state pending">BACKEND REQUIRED</span>
+            </article>
+            <article class="proof-row">
+              <span class="proof-number">07</span>
+              <div><h2>Responsible AI as a feature</h2><p>Exact external actions remain approval-gated. Important memory is visible, sourced, editable, and forgettable. Every route, tool result, repair, and decision stays in the trace.</p></div>
+              <span class="evidence-state">DESIGN COMPLETE</span>
+            </article>
+            <article class="proof-row">
+              <span class="proof-number">08</span>
+              <div><h2>Award package</h2><p>Tell the same story in three formats: a one-page poster, a two-minute live-recovery video, and a deployed demo link with the video as an offline backup.</p></div>
+              <span class="evidence-state">OUTLINE READY</span>
+            </article>
+          </section>
+
+          <aside class="evidence-panel" aria-label="Benchmark and award package status">
+            <section class="benchmark-block">
+              <small>20-TASK BENCHMARK</small>
+              <h2>Learning curve</h2>
+              <div class="benchmark-grid">
+                <div><strong>5</strong><span>Research</span></div>
+                <div><strong>5</strong><span>Coding</span></div>
+                <div><strong>5</strong><span>Math</span></div>
+                <div><strong>5</strong><span>Mixed goals</span></div>
+              </div>
+              <div class="curve-empty" role="img" aria-label="Learning curve awaiting baseline and post-learning benchmark results">
+                <div class="curve-axis"><span>Score</span><span>Baseline</span><span>After learning</span></div>
+                <p>Awaiting real benchmark runs</p>
+              </div>
+              <p class="evidence-note">Scores appear only after the deployed system completes the fixed set. No sample percentage is presented as a result.</p>
+            </section>
+            <section class="study-block">
+              <small>USER STUDY</small>
+              <h2>Evidence to collect</h2>
+              <ul>
+                <li>Tasks completed successfully</li>
+                <li>Minutes saved per task</li>
+                <li>Failures recovered automatically</li>
+                <li>Would use again</li>
+              </ul>
+            </section>
+            <section class="package-block">
+              <small>JUDGE KIT</small>
+              <div class="package-item"><strong>Poster</strong><span>Problem → loop → benchmark → impact</span></div>
+              <div class="package-item"><strong>Video</strong><span>Goal → failure → repair → approval</span></div>
+              <div class="package-item"><strong>Live demo</strong><span>Deployed v4 + offline backup</span></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section class="content view architecture" id="architectureView">
+        <div class="intro">
+          <p class="eyebrow">Taurus Core / system architecture</p>
+          <h1>Think. Plan. Solve. Grow.</h1>
+          <p class="lede">One clear loop: understand the goal, plan the work, route specialists, solve with tools, verify the result, and learn from approved memory and verified outcomes.</p>
+        </div>
+        <div class="flow" aria-label="Taurus Core architecture: understand, plan, route, solve, verify, and learn">
+          <article class="node router-node"><small>01 / INPUT</small><h3>Understand</h3><p>Read the goal, text, PDF or image evidence, constraints, and permissions.</p></article>
+          <article class="node"><small>02 / ORCHESTRATE</small><h3>Plan</h3><p>Break the goal into ordered, measurable steps.</p></article>
+          <article class="node"><small>03 / SELECT</small><h3>Route</h3><p>Choose the right general, code, or reasoning model using verified user outcomes.</p></article>
+          <article class="node"><small>04 / EXECUTE</small><h3>Solve</h3><p>Run specialists, retrieval, and tools against shared task state.</p></article>
+          <article class="node"><small>05 / CONTROL</small><h3>Verify</h3><p>Test outputs, repair failures, and gate external actions.</p></article>
+          <article class="node"><small>06 / MEMORY</small><h3>Learn</h3><p>Distill approved facts and verified corrections, then retrieve them only when relevant.</p></article>
+        </div>
+        <div class="principles">
+          <article class="principle"><h3>Semantic routing</h3><p>The router judges required capability and context, so users never need to know or choose model names.</p></article>
+          <article class="principle"><h3>Model policy</h3><p>Accuracy, tool support, latency, and fallback rules determine which approved specialist handles each subtask.</p></article>
+          <article class="principle"><h3>Human approval</h3><p>The exact message, event, or file action is shown before any external system is changed.</p></article>
+          <article class="principle"><h3>Selective memory</h3><p>Only important, approved facts and verified learning signals persist; each can be traced, updated, or forgotten.</p></article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (function () {
+      var prompt = document.getElementById('prompt');
+      var runButton = document.getElementById('runPreview');
+      var planPreview = document.getElementById('planPreview');
+      var planSummary = document.getElementById('planSummary');
+      var planSteps = document.getElementById('planSteps');
+      var badges = document.getElementById('routeBadges');
+      var advanceDemo = document.getElementById('advanceDemo');
+      var demoLog = document.getElementById('demoLog');
+      var demoStage = 0;
+      var workspaceView = document.getElementById('workspaceView');
+      var welcomeState = document.getElementById('welcomeState');
+      var bullStage = document.getElementById('bullStage');
+      var conversation = document.getElementById('conversation');
+      var chatHistoryList = document.getElementById('chatHistoryList');
+      var taskHistoryList = document.getElementById('taskHistoryList');
+      var sessionRuns = [];
+      var currentRunId = 0;
+      var runCounter = 0;
+
+      function escapeHtml(value) {
+        return value.replace(/[&<>'"]/g, function (char) {
+          return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char];
+        });
+      }
+
+      function setBullState(state) {
+        bullStage.setAttribute('data-state', state);
+        welcomeState.classList.toggle('working', state === 'working');
+        if (state === 'working') {
+          bullStage.setAttribute('aria-label', 'Taurus is in charge mode while routing and running the task');
+        } else if (state === 'done') {
+          bullStage.setAttribute('aria-label', 'Taurus is calm after mapping the task');
+        } else {
+          bullStage.setAttribute('aria-label', 'Taurus is calm and ready');
+        }
+      }
+
+      function shortTitle(value) {
+        return value.length > 34 ? value.slice(0, 34).trim() + '…' : value;
+      }
+
+      function renderHistory() {
+        if (!sessionRuns.length) {
+          chatHistoryList.innerHTML = '<p class="history-empty">Your conversations will appear here after you send a prompt.</p>';
+          taskHistoryList.innerHTML = '<p class="history-empty">Completed and in-progress tasks will appear here.</p>';
+          return;
+        }
+        chatHistoryList.innerHTML = sessionRuns.map(function (run) {
+          return '<button class="history-item' + (run.id === currentRunId ? ' active' : '') + '" data-run-id="' + run.id + '"><span class="history-title">' + escapeHtml(shortTitle(run.prompt)) + '</span><span class="history-meta">CHAT</span></button>';
+        }).join('');
+        taskHistoryList.innerHTML = sessionRuns.map(function (run) {
+          return '<button class="history-item ' + (run.status === 'RUNNING' ? 'running' : '') + '" data-run-id="' + run.id + '"><span class="history-title">' + escapeHtml(shortTitle(run.prompt)) + '</span><span class="history-meta">' + run.status + '</span></button>';
+        }).join('');
+        document.querySelectorAll('[data-run-id]').forEach(function (item) {
+          item.addEventListener('click', function () {
+            var id = Number(item.getAttribute('data-run-id'));
+            var run = sessionRuns.filter(function (entry) { return entry.id === id; })[0];
+            if (!run) return;
+            currentRunId = id;
+            prompt.value = run.prompt;
+            workspaceView.classList.add('has-conversation');
+            if (run.result) {
+              conversation.innerHTML = '<article class="chat-turn"><div class="chat-avatar">YOU</div><div><h3>You</h3><p>' + escapeHtml(run.prompt) + '</p></div></article><article class="chat-turn"><div class="chat-avatar taurus">T</div><div><h3>Taurus</h3>' + resultHtml(run.result) + '</div></article>';
+            } else {
+              conversation.innerHTML = '<article class="chat-turn"><div class="chat-avatar">YOU</div><div><h3>You</h3><p>' + escapeHtml(run.prompt) + '</p></div></article><article class="chat-turn"><div class="chat-avatar taurus">T</div><div><h3>Taurus</h3><p>The task was understood and routed across ' + escapeHtml(detectModels(run.roles).join(', ')) + '. Review the execution plan below.</p></div></article>';
+            }
+            buildPlan(run.prompt, run.roles);
+            planPreview.classList.add('visible');
+            setBullState(run.status === 'RUNNING' ? 'working' : 'done');
+            renderHistory();
+            showView('workspace');
+          });
+        });
+      }
+
+      function beginConversation(value, roles) {
+        runCounter += 1;
+        currentRunId = runCounter;
+        sessionRuns.unshift({ id: currentRunId, prompt: value, roles: roles, status: 'RUNNING' });
+        workspaceView.classList.add('has-conversation');
+        conversation.innerHTML = '<article class="chat-turn"><div class="chat-avatar">YOU</div><div><h3>You</h3><p>' + escapeHtml(value) + '</p></div></article><article class="chat-turn" id="workingTurn"><div class="chat-avatar taurus">T</div><div><h3>Taurus</h3><p class="working-line">UNDERSTANDING → ROUTING → PLANNING</p></div></article>';
+        planPreview.classList.remove('visible');
+        setBullState('working');
+        renderHistory();
+      }
+
+      function finishConversation(value, roles) {
+        var current = sessionRuns.filter(function (run) { return run.id === currentRunId; })[0];
+        if (current) current.status = 'DONE';
+        var workingTurn = document.getElementById('workingTurn');
+        if (workingTurn) {
+          workingTurn.outerHTML = '<article class="chat-turn"><div class="chat-avatar taurus">T</div><div><h3>Taurus</h3><p>I split this into the right capabilities and prepared a seven-stage execution plan using ' + escapeHtml(detectModels(roles).join(', ')) + '. The final stage reviews verified corrections and important memory candidates; nothing is stored automatically.</p></div></article>';
+        }
+        setBullState('done');
+        renderHistory();
+      }
+
+      function showView(name) {
+        document.querySelectorAll('.view').forEach(function (view) { view.classList.remove('visible'); });
+        document.querySelectorAll('.view-tab').forEach(function (tab) { tab.classList.toggle('active', tab.getAttribute('data-view') === name); });
+        document.getElementById(name + 'View').classList.add('visible');
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+
+      function detectRoles(value) {
+        var text = value.toLowerCase();
+        var roles = ['Planner', 'Model Router'];
+        if (/research|search|source|compare|find|evaluate/.test(text)) roles.push('Research');
+        if (/code|python|bug|function|script|program|build|test/.test(text)) roles.push('Coding');
+        if (/math|solve|equation|calculate|verify|number|formula|interest/.test(text)) roles.push('Math');
+        if (/message|email|draft|professor|reply|update/.test(text)) roles.push('Messaging');
+        if (/reminder|calendar|schedule|send|save|file|export/.test(text)) roles.push('Executor');
+        roles.push('Critic');
+        return roles.filter(function (role, index) { return roles.indexOf(role) === index; });
+      }
+
+      function detectModels(roles) {
+        var models = [];
+        if (roles.indexOf('Research') > -1 || roles.indexOf('Messaging') > -1) models.push('General model');
+        if (roles.indexOf('Coding') > -1) models.push('Code model');
+        if (roles.indexOf('Math') > -1) models.push('Reasoning model');
+        if (!models.length) models.push('General model');
+        return models;
+      }
+
+      function buildPlan(value, roles) {
+        var models = detectModels(roles);
+        var specialists = roles.filter(function (r) { return !/Planner|Model Router|Critic|Executor/.test(r); }).join(' + ').toUpperCase() || 'GENERAL';
+        var steps = [
+          {title:'Understand the goal', text:'Infer intent, success criteria, dependencies, permissions, and stopping conditions from the prompt.', owner:'PLANNER'},
+          {title:'Select specialist models', text:'Classify each subtask by capability and apply routing policy automatically: ' + models.join(', ') + '.', owner:'MODEL ROUTER'},
+          {title:'Run specialist work', text:'Delegate independent work to the selected models and tools; keep dependent steps ordered in shared task state.', owner:specialists},
+          {title:'Observe and repair', text:'Inspect tool results, test claims or code, and retry recoverable failures with the best-fit specialist.', owner:'CRITIC'},
+          {title:'Request action approval', text:roles.indexOf('Executor') > -1 ? 'Show the exact draft, calendar change, or file operation before execution.' : 'Show the final deliverable and any optional external action before execution.', owner:'EXECUTOR'},
+          {title:'Execute and audit', text:'Perform only approved actions, record the selected model class and result, then return a concise completion report.', owner:'PLANNER'},
+          {title:'Learn selectively', text:'Review the trace for reusable corrections or important facts. Require confirmation before durable personal memory and never store secrets.', owner:'MEMORY'}
+        ];
+        planSummary.textContent = 'Seven stages for: “' + value + '”';
+        badges.innerHTML = roles.concat(models).map(function (role) { return '<span class="route-badge">' + role.toUpperCase() + '</span>'; }).join('');
+        planSteps.innerHTML = steps.map(function (step, index) {
+          return '<article class="plan-step"><span class="plan-index">' + (index + 1) + '</span><div><h3>' + escapeHtml(step.title) + '</h3><p>' + escapeHtml(step.text) + '</p></div><span class="step-owner">' + escapeHtml(step.owner) + '</span></article>';
+        }).join('');
+      }
+
+      function renderMarkdownLite(text) {
+        // Safe minimal rendering: escape HTML, then handle ``` code blocks + newlines.
+        var parts = String(text || '').split('```');
+        var out = '';
+        for (var i = 0; i < parts.length; i++) {
+          var chunk = escapeHtml(parts[i]);
+          if (i % 2 === 1) {
+            out += '<pre>' + chunk.replace(/^\n/, '') + '</pre>';
+          } else {
+            out += chunk.replace(/\n/g, '<br>');
+          }
+        }
+        return out;
+      }
+
+      function rolesFromDecision(decision) {
+        if (!decision) return null;
+        var task = (decision.task_type || 'research').toLowerCase();
+        if (task === 'coding') return ['Planner', 'Model Router', 'Coding', 'Critic'];
+        if (task === 'math') return ['Planner', 'Model Router', 'Math', 'Critic'];
+        if (task === 'multi') return ['Planner', 'Model Router', 'Research', 'Coding', 'Math', 'Messaging', 'Executor', 'Critic'];
+        if (task === 'memory') return ['Planner', 'Model Router', 'Critic'];
+        return ['Planner', 'Model Router', 'Research', 'Critic'];
+      }
+
+      function resultHtml(data) {
+        var d = data.decision || {};
+        var badge = 'ROUTED: ' + escapeHtml(String(d.task_type || '?').toUpperCase())
+          + ' &rarr; ' + escapeHtml(String(d.model || '?'));
+        if (d.reason) badge += ' &middot; ' + escapeHtml(String(d.reason).slice(0, 140));
+        var html = '<div class="real-result"><span class="router-badge-real">' + badge + '</span>';
+        html += '<div class="result-body">' + renderMarkdownLite(data.final || '') + '</div>';
+        var learned = data.learned || {};
+        var items = [];
+        (learned.lessons || []).forEach(function (ls) { items.push(escapeHtml(ls.lesson || '')); });
+        (learned.important_saved || []).forEach(function (imp) { items.push('Saved important: ' + escapeHtml(imp.text || '')); });
+        if (items.length) {
+          html += '<div class="learned-block"><h4>What Taurus Learned</h4><ul><li>'
+            + items.join('</li><li>') + '</li></ul></div>';
+        }
+        if (data.memory_context) {
+          html += '<div class="learned-block"><h4>Memory used</h4><p style="font-size:13px; margin:0;">'
+            + escapeHtml(String(data.memory_context).slice(0, 800)) + '</p></div>';
+        }
+        if (data.trace && data.trace.length) {
+          html += '<details class="trace-details"><summary>Full Trace (' + data.trace.length + ' steps)</summary><pre>'
+            + escapeHtml(data.trace.join('\n')) + '</pre></details>';
+        }
+        html += '</div>';
+        return html;
+      }
+
+      function finishWithRealResult(value, roles, data) {
+        var current = sessionRuns.filter(function (run) { return run.id === currentRunId; })[0];
+        if (current) { current.status = 'DONE'; current.result = data; current.roles = roles; }
+        var workingTurn = document.getElementById('workingTurn');
+        if (workingTurn) {
+          workingTurn.outerHTML = '<article class="chat-turn"><div class="chat-avatar taurus">T</div><div><h3>Taurus</h3>'
+            + resultHtml(data) + '</div></article>';
+        }
+        setBullState('done');
+        renderHistory();
+      }
+
+      function finishWithError(message) {
+        var current = sessionRuns.filter(function (run) { return run.id === currentRunId; })[0];
+        if (current) { current.status = 'DONE'; }
+        var workingTurn = document.getElementById('workingTurn');
+        if (workingTurn) {
+          workingTurn.outerHTML = '<article class="chat-turn"><div class="chat-avatar taurus">T</div><div><h3>Taurus</h3>'
+            + '<p class="error-turn">' + escapeHtml(message) + '</p></div></article>';
+        }
+        setBullState('calm');
+        renderHistory();
+      }
+
+      async function runPreview() {
+        var value = prompt.value.trim();
+        if (!value) {
+          prompt.focus();
+          prompt.setAttribute('placeholder', 'Write a task first — or choose a sample below.');
+          return;
+        }
+        var feedbackEl = document.getElementById('feedbackInput');
+        var feedback = feedbackEl ? feedbackEl.value.trim() : '';
+        var roles = detectRoles(value);
+        runButton.disabled = true;
+        runButton.querySelector('span').textContent = 'Working…';
+        beginConversation(value, roles);
+        // Show the 7-stage plan skeleton immediately; real routing badge arrives with the result.
+        buildPlan(value, roles);
+        planPreview.classList.add('visible');
+        try {
+          var resp = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: value, feedback: feedback })
+          });
+          var data = await resp.json();
+          if (!resp.ok || data.error) {
+            finishWithError(data.error || ('Request failed (HTTP ' + resp.status + ')'));
+          } else {
+            var realRoles = rolesFromDecision(data.decision) || roles;
+            buildPlan(value, realRoles);
+            finishWithRealResult(value, realRoles, data);
+          }
+        } catch (err) {
+          finishWithError('Could not reach Taurus backend: ' + err.message);
+        } finally {
+          runButton.disabled = false;
+          runButton.querySelector('span').textContent = 'Send';
+          planPreview.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+        }
+      }
+
+      async function loadRealMemory() {
+        try {
+          var resp = await fetch('/api/memory');
+          if (!resp.ok) return;
+          var data = await resp.json();
+          var box = document.querySelector('.memory-empty');
+          if (!box) return;
+          var items = (data.important || []).slice(-10);
+          var lessons = (data.lessons || []).slice(-10);
+          if (!items.length && !lessons.length) return;
+          var html = '<small>APPROVED MEMORY</small><h2>Confirmed memories (live)</h2><ul class="memory-real-list">';
+          items.forEach(function (it) {
+            html += '<li><strong>' + escapeHtml(String(it.category || '')) + '</strong> (importance '
+              + escapeHtml(String(it.importance)) + '): ' + escapeHtml(String(it.text || '')) + '</li>';
+          });
+          lessons.forEach(function (ls) {
+            html += '<li>Lesson [' + escapeHtml(String(ls.applies_to || '')) + ']: '
+              + escapeHtml(String(ls.lesson || '')) + '</li>';
+          });
+          html += '</ul>';
+          box.innerHTML = html;
+        } catch (e) { /* keep static fallback */ }
+      }
+
+      function updateDemoSteps() {
+        document.querySelectorAll('.demo-step').forEach(function (step) {
+          var stage = Number(step.getAttribute('data-stage'));
+          step.classList.toggle('done', stage < demoStage);
+          step.classList.toggle('active', stage === demoStage && demoStage < 8);
+          var marker = step.querySelector('.marker');
+          marker.textContent = stage < demoStage ? '✓' : String(stage + 1);
+        });
+      }
+
+      function addLog(agent, title, body, extra) {
+        if (demoLog.querySelector('.empty-log')) demoLog.innerHTML = '';
+        demoLog.insertAdjacentHTML('beforeend', '<article class="log-entry"><div class="log-agent">' + agent + '</div><div class="log-body"><h3>' + title + '</h3><p>' + body + '</p>' + (extra || '') + '</div></article>');
+      }
+
+      function advance() {
+        if (demoStage === 0) {
+          addLog('MODEL ROUTER', 'Goal understood and specialists selected', 'Taurus split one internship goal into research, ranking, code, communication, calendar, and report subtasks without asking the user to choose a model.', '<ul><li>Listings + outreach → General model</li><li>Fit scorer → Code model</li><li>Weighted ranking → Reasoning model</li><li>Draft, reminder, report → Approval-gated executor</li></ul>');
+          demoStage = 1;
+          advanceDemo.textContent = 'Create execution plan';
+        } else if (demoStage === 1) {
+          addLog('PLANNER', 'Evidence-first plan created', 'The workflow requires sourced listings before ranking, tests the scoring function before using it, drafts the outreach only after the best fit is selected, and keeps every external action behind approval.');
+          demoStage = 2;
+          advanceDemo.textContent = 'Gather evidence';
+        } else if (demoStage === 2) {
+          addLog('RESEARCH AGENT', 'Source contract prepared', 'A connected build would collect five current internships with exact role, company, location, eligibility, deadline, and source URL. This static preview does not invent listings or availability.');
+          addLog('RAG AGENT', 'Personal evidence route prepared', 'If the user adds a résumé, notes PDF, or question-paper image, Taurus retrieves only relevant passages, keeps citations, and routes code or math fragments to the matching specialist.');
+          demoStage = 3;
+          advanceDemo.textContent = 'Run ranking code';
+        } else if (demoStage === 3) {
+          addLog('CODE MODEL', 'First scorer failed its test', 'The generated function accepted a negative skill-match value and produced an invalid ranking. Taurus exposes the failure instead of hiding it.', '<pre>def fit_score(skills, role_match):\n    return skills * 0.6 + role_match * 0.4\n\nassert fit_score(8, -2) &gt;= 0  # FAILED</pre>');
+          addLog('CRITIC → CODE MODEL', 'Repair tested before continuing', 'The critic returned the defect with a concrete constraint. The repaired function clamps each component to the valid range and passes boundary tests.', '<pre>def fit_score(skills, role_match):\n    skills = max(0, min(skills, 10))\n    role_match = max(0, min(role_match, 10))\n    return skills * 0.6 + role_match * 0.4</pre>');
+          demoStage = 4;
+          advanceDemo.textContent = 'Prepare approval';
+        } else if (demoStage === 4) {
+          addLog('GENERAL MODEL', 'Deliverables assembled', 'Taurus prepared a sourced ranking format, a concise outreach draft for the top verified role, and a follow-up reminder. The exact content would be populated only from connected search results.');
+          demoLog.insertAdjacentHTML('beforeend', '<div class="approval-card"><h3>Approval required</h3><p>Review each external action before the executor is unlocked.</p><div class="approval-list"><div class="approval-item"><strong>Gmail</strong><span>Create one draft</span></div><div class="approval-item"><strong>Calendar</strong><span>Create one follow-up reminder</span></div><div class="approval-item"><strong>Files</strong><span>Export sourced internship report</span></div></div></div>');
+          demoStage = 5;
+          advanceDemo.textContent = 'Approve demo actions';
+        } else if (demoStage === 5) {
+          addLog('EXECUTOR', 'Approval recorded — preview stopped safely', 'The approval flow completed, but this static preview made no Gmail, Calendar, file, web, model, or code-execution calls. A connected backend would execute only the reviewed actions and record each result.');
+          demoStage = 6;
+          advanceDemo.textContent = 'Review learning';
+        } else if (demoStage === 6) {
+          addLog('MEMORY + ROUTER', 'Verified learning signal proposed', 'The invalid-input repair can strengthen future critic checks. Model outcomes can also update the user-specific routing score after enough verified runs. No personal fact is stored without confirmation.');
+          demoStage = 7;
+          advanceDemo.textContent = 'Record evidence';
+        } else if (demoStage === 7) {
+          addLog('EVALUATOR', 'Run prepared for the learning curve', 'Route accuracy, test success, recovery, source coverage, and approval compliance are mapped to the same rubric used by the 20-task baseline. The real score stays empty until the deployed backend executes the benchmark.');
+          addLog('PLANNER', 'Award story complete', 'One goal showed autonomous routing, grounded inputs, visible failure, successful repair, safe approval, selective learning, and measurable evidence—without claiming unverified results.');
+          demoStage = 8;
+          advanceDemo.textContent = 'Demo complete';
+          advanceDemo.disabled = true;
+        }
+        updateDemoSteps();
+      }
+
+      function resetDemo() {
+        demoStage = 0;
+        demoLog.innerHTML = '<p class="empty-log">The goal is ready. Start the run to see Taurus infer the task types, choose specialist models, recover from a deliberate code failure, and stop before any external action.</p>';
+        advanceDemo.disabled = false;
+        advanceDemo.textContent = 'Start guided demo';
+        updateDemoSteps();
+      }
+
+      document.querySelectorAll('.history-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          document.querySelectorAll('.history-tab').forEach(function (item) {
+            var active = item === tab;
+            item.classList.toggle('active', active);
+            item.setAttribute('aria-selected', active ? 'true' : 'false');
+          });
+          document.querySelectorAll('.history-panel').forEach(function (panel) { panel.classList.remove('visible'); });
+          document.getElementById(tab.getAttribute('data-history') + 'History').classList.add('visible');
+        });
+      });
+      document.querySelectorAll('.view-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () { showView(tab.getAttribute('data-view')); });
+      });
+      document.querySelectorAll('.suggestion').forEach(function (button) {
+        button.addEventListener('click', function () {
+          if (button.getAttribute('data-demo') === 'true') {
+            showView('demo');
+            resetDemo();
+          } else {
+            prompt.value = button.getAttribute('data-prompt');
+            prompt.focus();
+          }
+        });
+      });
+      runButton.addEventListener('click', runPreview);
+      prompt.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          if (!runButton.disabled) runPreview();
+        }
+      });
+      document.getElementById('newRequest').addEventListener('click', function () {
+        prompt.value = '';
+        currentRunId = 0;
+        workspaceView.classList.remove('has-conversation');
+        conversation.innerHTML = '';
+        planPreview.classList.remove('visible');
+        document.getElementById('capabilities').style.display = '';
+        runButton.disabled = false;
+        runButton.querySelector('span').textContent = 'Send';
+        setBullState('calm');
+        renderHistory();
+        showView('workspace');
+        prompt.focus();
+      });
+      document.getElementById('openAwardDemo').addEventListener('click', function () {
+        resetDemo();
+        showView('demo');
+      });
+      advanceDemo.addEventListener('click', advance);
+      loadRealMemory();
+      document.getElementById('resetDemo').addEventListener('click', resetDemo);
+    })();
+  </script>
+</body>
+</html>
